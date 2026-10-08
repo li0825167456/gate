@@ -297,8 +297,8 @@ EDGE_HOSTS = [
     h.strip()
     for h in os.environ.get(
         "EDGE_HOSTS",
-        "www.xflash.vip:443,www.carousell.sg:443,ex.warspite.dpdns.org:443,www.akasantech.com:443,"
-        "guide.for.edu.sg:443,wppaunz.com:443,thebeat.gehealthcare.com:443",
+        "jobsdb.com:443,m.iyf.tv:443,www.deepl.com:443,coreweave.com:443,"
+        "53.fs1.hubspotusercontent-na1.net:443,thebeat.gehealthcare.com:443,www.mastervolt.com:443",
     ).split(",")
     if h.strip()
 ]
