@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
   pages: write
   id-token: write
 
@@ -65,9 +66,34 @@ jobs:
         with:
           path: 'public'
 
+      # 上传后稍等, 避免 deploy 立刻查不到 artifact
+      - name: Wait for artifact to register
+        run: sleep 20
+
       - name: Deploy to GitHub Pages
         id: deployment
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+
+      # 失败自动重试 (GitHub 偶发 "No artifacts named github-pages were found")
+      - name: Wait before retry 1
+        if: steps.deployment.outcome == 'failure'
+        run: sleep 45
+
+      - name: Deploy to GitHub Pages (retry 1)
+        id: deployment_retry1
+        if: steps.deployment.outcome == 'failure'
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
+
+      - name: Wait before retry 2
+        if: steps.deployment.outcome == 'failure' && steps.deployment_retry1.outcome == 'failure'
+        run: sleep 90
+
+      - name: Deploy to GitHub Pages (retry 2)
+        id: deployment_retry2
+        if: steps.deployment.outcome == 'failure' && steps.deployment_retry1.outcome == 'failure'
         uses: actions/deploy-pages@v4
 
       - name: Show site URL
-        run: 'echo "site: https://li0825167456.github.io/gate/ (deploy outcome: ${{ steps.deployment.outcome }})"'
+        run: 'echo "site: https://li0825167456.github.io/gate/ (deploy: ${{ steps.deployment.outcome }} / retry1: ${{ steps.deployment_retry1.outcome }} / retry2: ${{ steps.deployment_retry2.outcome }})"'
